@@ -79,7 +79,6 @@ public class MainActivityFragment extends Fragment {
         String forecastJsonStr;  // Store final JsonString
 
         try {
-
             URL url = new URL("http://api.openweathermap.org/data/2.5/find?q=London,uk&units=metric&appid=4000c8df847f8f70e1e052a2855da229");
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
