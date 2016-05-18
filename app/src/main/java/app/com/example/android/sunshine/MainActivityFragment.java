@@ -2,12 +2,19 @@ package app.com.example.android.sunshine;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,13 +33,13 @@ public class MainActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_main,container,false);
+        rootView = inflater.inflate(R.layout.fragment_main, container, false);
         populateListView();
-
+      //  httpConnectionToGetWeatherData();
         return rootView;
     }
 
-    public void populateListView(){
+    public void populateListView() {
 
         String[] forecastArray = {
                 "Today - Sunny - 88/63",
@@ -62,6 +69,58 @@ public class MainActivityFragment extends Fragment {
         // Get a reference to the ListView and attach this adapter to the ListView
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
         listView.setAdapter(mForecastAdapter);
+    }
+
+    public void httpConnectionToGetWeatherData() {
+
+        HttpURLConnection urlConnection = null;
+
+        BufferedReader reader = null;
+        String forecastJsonStr;  // Store final JsonString
+
+        try {
+
+            URL url = new URL("http://api.openweathermap.org/data/2.5/find?q=London,uk&units=metric&appid=4000c8df847f8f70e1e052a2855da229");
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("GET");
+            urlConnection.connect();
+
+            String line;             // Used to store each line from the input stream
+            StringBuilder buffer = new StringBuilder();
+
+            //Read the input stream into a string
+            InputStream inputStream = urlConnection.getInputStream();
+
+            if (inputStream == null) {
+                return;
+            }
+            reader = new BufferedReader(new InputStreamReader(inputStream));
+            while ((line = reader.readLine())!=null) {
+                buffer.append(line).append("\n");
+            }
+
+            if (buffer.length()==0) {
+                return;
+            }
+            forecastJsonStr=buffer.toString();
+            Log.i("Forecast info : ",forecastJsonStr);
+
+        } catch (IOException e) {
+            Log.e("PlaceholderFragment", "Error", e);
+
+        } finally {
+            if (urlConnection!=null){
+                urlConnection.disconnect();
+            }
+            if(reader!=null){
+                try{
+                    reader.close();
+                } catch (final IOException e){
+                    Log.e("PlaceholderFragment","Error Closing stream",e);
+                }
+            }
+        }
+
     }
 
 }
