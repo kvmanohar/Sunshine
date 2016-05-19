@@ -1,5 +1,6 @@
 package app.com.example.android.sunshine;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -35,7 +36,7 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
         populateListView();
-      //  httpConnectionToGetWeatherData();
+        //  httpConnectionToGetWeatherData();
         return rootView;
     }
 
@@ -71,55 +72,60 @@ public class MainActivityFragment extends Fragment {
         listView.setAdapter(mForecastAdapter);
     }
 
-    public void httpConnectionToGetWeatherData() {
+    public class FetchWeatherTask extends AsyncTask<Void, Void, Void> {
 
-        HttpURLConnection urlConnection = null;
+        private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 
-        BufferedReader reader = null;
-        String forecastJsonStr;  // Store final JsonString
+        @Override
+        protected Void doInBackground(Void... params) {
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+            String forecastJsonStr;  // Store final JsonString
 
-        try {
-            URL url = new URL("http://api.openweathermap.org/data/2.5/find?q=London,uk&units=metric&appid=4000c8df847f8f70e1e052a2855da229");
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
+            try {
 
-            String line;             // Used to store each line from the input stream
-            StringBuilder buffer = new StringBuilder();
+                String baseURL = "http://api.openweathermap.org/data/2.5/find?q=London,uk&units=metric";
+                String apiKey = "&APPID="+ BuildConfig.OPEN_WEATHER_MAP_API_KEY;
+                URL url = new URL(baseURL.concat(apiKey));
 
-            //Read the input stream into a string
-            InputStream inputStream = urlConnection.getInputStream();
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
 
-            if (inputStream == null) {
-                return;
-            }
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-            while ((line = reader.readLine())!=null) {
-                buffer.append(line).append("\n");
-            }
+                //Read the input stream into a string
+                InputStream inputStream = urlConnection.getInputStream();
+                if (inputStream == null) {
+                    return null;
+                }
 
-            if (buffer.length()==0) {
-                return;
-            }
-            forecastJsonStr=buffer.toString();
-            Log.i("Forecast info : ",forecastJsonStr);
+                StringBuilder builder = new StringBuilder();
+                reader = new BufferedReader(new InputStreamReader(inputStream));
 
-        } catch (IOException e) {
-            Log.e("PlaceholderFragment", "Error", e);
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    builder.append(line).append("\n");
+                }
 
-        } finally {
-            if (urlConnection!=null){
-                urlConnection.disconnect();
-            }
-            if(reader!=null){
-                try{
-                    reader.close();
-                } catch (final IOException e){
-                    Log.e("PlaceholderFragment","Error Closing stream",e);
+                if (builder.length() == 0) {
+                    return null;
+                }
+                forecastJsonStr = builder.toString();
+                Log.i("Forecast info : ", forecastJsonStr);
+
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "Error", e);
+
+            } finally {
+                if (urlConnection != null)  urlConnection.disconnect();
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (final IOException e) {
+                        Log.e(LOG_TAG, "Error Closing stream", e);
+                    }
                 }
             }
+            return null;
         }
-
     }
-
 }
