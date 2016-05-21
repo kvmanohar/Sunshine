@@ -2,9 +2,13 @@ package app.com.example.android.sunshine;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -32,12 +36,35 @@ public class MainActivityFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_main, container, false);
         populateListView();
         //  httpConnectionToGetWeatherData();
         return rootView;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.forecastfragment, menu);
+//                super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_refresh) {
+            FetchWeatherTask weatherTask = new FetchWeatherTask();
+            weatherTask.execute();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void populateListView() {
@@ -85,7 +112,7 @@ public class MainActivityFragment extends Fragment {
             try {
 
                 String baseURL = "http://api.openweathermap.org/data/2.5/find?q=London,uk&units=metric";
-                String apiKey = "&APPID="+ BuildConfig.OPEN_WEATHER_MAP_API_KEY;
+                String apiKey = "&APPID=" + BuildConfig.OPEN_WEATHER_MAP_API_KEY;
                 URL url = new URL(baseURL.concat(apiKey));
 
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -116,7 +143,7 @@ public class MainActivityFragment extends Fragment {
                 Log.e(LOG_TAG, "Error", e);
 
             } finally {
-                if (urlConnection != null)  urlConnection.disconnect();
+                if (urlConnection != null) urlConnection.disconnect();
                 if (reader != null) {
                     try {
                         reader.close();
