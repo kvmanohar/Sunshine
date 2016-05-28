@@ -107,73 +107,89 @@ public class MainActivityFragment extends Fragment {
         @Override
         protected Void doInBackground(String... params) {
             HttpURLConnection urlConnection = null;
-            BufferedReader reader = null;
-            String forecastJsonStr;  // Store final JsonString
 
-            String format ="json";
-            String units = "metric";
-            int numDays =7;
+            String weatherUri;
+            String forecastJsonStr;  // Store JsonString
 
             try {
 
-                final String FORECAST_BASE_URL= "http://api.openweathermap.org/data/2.5/forecast/daily?";
-                final String QUERY_PARAM = "q";
-                final String FORMAT_PARAM ="mode";
-                final String UNIT_PARAM ="units";
-                final String DAYS_PARAM ="cnt";
-                final String APPID_PARAM="APPID";
+                weatherUri = buildUriString(params[0], 7);
+                Log.v(LOG_TAG, "Build URI : " + weatherUri);
 
-                Uri buildUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
-                        .appendQueryParameter(QUERY_PARAM,params[0])
-                        .appendQueryParameter(FORMAT_PARAM,format)
-                        .appendQueryParameter(UNIT_PARAM,units)
-                        .appendQueryParameter(DAYS_PARAM,Integer.toString(numDays))
-                        .appendQueryParameter(APPID_PARAM,BuildConfig.OPEN_WEATHER_MAP_API_KEY)
-                        .build();
-                Log.v(LOG_TAG,"Build URI " + buildUri.toString());
-
-//                String baseURL = "http://api.openweathermap.org/data/2.5/forecast/daily?q=SS141FG&mode=json&units=metric&cnt=7";
-//                String apiKey = "&APPID=" + BuildConfig.OPEN_WEATHER_MAP_API_KEY;
-                URL url = new URL(buildUri.toString());
-
+                URL url = new URL(weatherUri);
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.connect();
 
-                //Read the input stream into a string
+
                 InputStream inputStream = urlConnection.getInputStream();
                 if (inputStream == null) {
                     return null;
                 }
 
-                StringBuilder builder = new StringBuilder();
-                reader = new BufferedReader(new InputStreamReader(inputStream));
+                forecastJsonStr = extractJSONFromInputStream(inputStream);
+                Log.v("Forecast info : ", forecastJsonStr);
 
-                String line;
-                while ((line = reader.readLine()) != null) {
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "Error :", e);
+
+            } finally {
+                if (urlConnection != null) urlConnection.disconnect();
+            }
+            return null;
+        }
+
+        public String buildUriString(String postCode, int numDays) {
+
+//      "http://api.openweathermap.org/data/2.5/forecast/daily?q=SS141FG&mode=json&units=metric&cnt=7";
+
+            String format = "json";
+            String units = "metric";
+            final String FORECAST_BASE_URL = "http://api.openweathermap.org/data/2.5/forecast/daily?";
+            final String QUERY_PARAM = "q";
+            final String FORMAT_PARAM = "mode";
+            final String UNIT_PARAM = "units";
+            final String DAYS_PARAM = "cnt";
+            final String APPID_PARAM = "APPID";
+
+            Uri buildUri = Uri.parse(FORECAST_BASE_URL).buildUpon()
+                    .appendQueryParameter(QUERY_PARAM, postCode)
+                    .appendQueryParameter(FORMAT_PARAM, format)
+                    .appendQueryParameter(UNIT_PARAM, units)
+                    .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
+                    .appendQueryParameter(APPID_PARAM, BuildConfig.OPEN_WEATHER_MAP_API_KEY)
+                    .build();
+            return buildUri.toString();
+        }
+
+        public String extractJSONFromInputStream(InputStream inputStream) {
+
+            BufferedReader bufferedReader;
+            String forecastJsonStr = null;
+            String line;
+
+            StringBuilder builder = new StringBuilder();
+            bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+            try {
+                while ((line = bufferedReader.readLine()) != null) {
                     builder.append(line).append("\n");
                 }
-
                 if (builder.length() == 0) {
                     return null;
                 }
                 forecastJsonStr = builder.toString();
-                Log.v("Forecast info : ", forecastJsonStr);
 
             } catch (IOException e) {
-                Log.e(LOG_TAG, "Error", e);
-
+                Log.e("extractJSON", "", e);
             } finally {
-                if (urlConnection != null) urlConnection.disconnect();
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.e(LOG_TAG, "Error Closing stream", e);
-                    }
+                try {
+                    bufferedReader.close();
+                } catch (final IOException e) {
+                    Log.e(LOG_TAG, "Error Closing bufferReader", e);
                 }
             }
-            return null;
+            return forecastJsonStr;
         }
+
     }
 }
