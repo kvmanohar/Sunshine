@@ -87,13 +87,13 @@ public class MainActivityFragment extends Fragment {
                 "Sat - Help Pepped in Weather station - 72/60",
                 "Sun - Sunny - 80/68"
         };
-        List<String> weekForecast = new ArrayList<>(
+        List<String> weekForecastList = new ArrayList<>(
                 Arrays.asList(forecastArray));
 
         //Now that we have dummy forecast data, create Array adapter.
         //The Array adapter takes data from a source (like our dummy forecastArray
         //use it populate the ListView it's attached to.
-        ArrayAdapter<String> mForecastAdapter = new ArrayAdapter<>(
+         mForecastAdapter = new ArrayAdapter<>(
                 //the Current context (this fragment's parent activity
                 getActivity(),
                 //ID of list item layout
@@ -101,12 +101,13 @@ public class MainActivityFragment extends Fragment {
                 //ID of the textView to populate
                 R.id.list_item_forecast_textview,
                 // Forecast data
-                weekForecast);
+                 weekForecastList);
 
         // Get a reference to the ListView and attach this adapter to the ListView
         ListView listView = (ListView) view.findViewById(R.id.listview_forecast);
         listView.setAdapter(mForecastAdapter);
     }
+
 
     public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 
@@ -141,7 +142,6 @@ public class MainActivityFragment extends Fragment {
             return buildUri.toString();
         }
 
-        @Nullable
         private String extractJsonFromInputStream(InputStream inputStream) {
             BufferedReader bufferedReader;
             String forecastJsonStr = null;
@@ -184,6 +184,7 @@ public class MainActivityFragment extends Fragment {
             JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
 
             GregorianCalendar gc = new GregorianCalendar();
+            gc.add(GregorianCalendar.DATE, -1);
 
             String[] resultStrs = new String[numDays];
             for (int i = 0; i < weatherArray.length(); i++) {
@@ -196,7 +197,7 @@ public class MainActivityFragment extends Fragment {
                 JSONObject dayForecast = weatherArray.getJSONObject(i);
 
                 // Build the Day and date string
-                gc.add(GregorianCalendar.DATE, i);
+                gc.add(GregorianCalendar.DATE, 1);
                 Date time = gc.getTime();
                 SimpleDateFormat shortenedDateFormat = new SimpleDateFormat("EEE MMM dd");
                 day = shortenedDateFormat.format(time);
@@ -271,6 +272,17 @@ public class MainActivityFragment extends Fragment {
 
             // This will only happen if there was an error getting or parsing the forecast.
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(String[] result) {
+            if (result !=null){
+                mForecastAdapter.clear();
+                for (String dayForeCastStr : result){
+                    mForecastAdapter.add(dayForeCastStr);
+                }
+            }
+//            super.onPostExecute(strings);
         }
     }
 }
