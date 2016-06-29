@@ -1,5 +1,6 @@
 package app.com.example.android.sunshine;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,11 +38,11 @@ import java.util.List;
  * A placeholder fragment containing a simple view.
  * http://api.openweathermap.org/data/2.5/find?q=London,uk&units=metric&appid=4000c8df847f8f70e1e052a2855da229
  */
-public class MainActivityFragment extends Fragment {
+public class ForecastFragment extends Fragment {
 
     private ArrayAdapter<String> mForecastAdapter;
 
-    public MainActivityFragment() {
+    public ForecastFragment() {
     }
 
     @Override
@@ -113,11 +113,16 @@ public class MainActivityFragment extends Fragment {
     }
 
     public AdapterView.OnItemClickListener lvOnItemClickListener = new AdapterView.OnItemClickListener(){
-
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             String forecast = mForecastAdapter.getItem(position);
-            Toast.makeText(getActivity(), forecast, Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getActivity(), forecast, Toast.LENGTH_SHORT).show();
+
+            Intent intent = new Intent(getActivity(),DetailActivity.class)
+                    .putExtra(Intent.EXTRA_TEXT,forecast);
+
+            startActivity(intent);
+
         }
     };
 
