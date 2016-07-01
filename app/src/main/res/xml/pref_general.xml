@@ -2,10 +2,19 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <EditTextPreference
-        android:title="@string/pref_location_label"
-        android:key="@string/pref_location_key"
         android:defaultValue="@string/pref_location_default"
         android:inputType="text"
-        android:singleLine="true"/>
+        android:key="@string/pref_location_key"
+        android:singleLine="true"
+        android:summary="Set a valid postcode for the weather info"
+        android:title="@string/pref_location_label" />
+
+    <ListPreference
+        android:defaultValue="@string/pref_unit_metric"
+        android:entries="@array/pref_unit_options"
+        android:entryValues="@array/pref_unit_values"
+        android:key="@string/pref_unit_key"
+        android:summary="Select the option to display temperature in relevant units"
+        android:title="@string/pref_unit_label" />
 
 </PreferenceScreen>
