@@ -1,11 +1,11 @@
 package app.com.example.android.sunshine;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 
 /**
@@ -40,7 +40,10 @@ public class DetailActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
-            Toast.makeText(this, "Settings clicked", Toast.LENGTH_SHORT).show();
+
+            startActivity(new Intent(this,SettingsActivity.class));
+            return true;
+//            Toast.makeText(this, "Settings clicked", Toast.LENGTH_SHORT).show();
         }
 
         return super.onOptionsItemSelected(item);

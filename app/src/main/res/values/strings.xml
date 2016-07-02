@@ -3,4 +3,27 @@
     <string name="action_settings">Settings</string>
     <string name="action_refresh" translatable="false">Refresh</string>
 
+
+    <!--Strings used in PreferredSettings XML-->
+    <string name="pref_location_label" translatable="false">Location Postcode</string>
+    <string name="pref_location_key" translatable="false">location</string>
+    <string name="pref_location_default" translatable="false">SS141FG</string>
+
+
+    <!--Strings for Temperature Unit Options in settings screen-->
+
+    <!-- Label for the temperature units preference [CHAR LIMIT=30] -->
+    <string name="pref_unit_label" translatable="false">Temperature Unit</string>
+    <!-- Label for the temperature unit Key  [CHAR LIMIT=NONE] -->
+    <string name="pref_unit_key" translatable="false">unit</string>
+    <!-- Label for the label metric [CHAR LIMIT=25] -->
+    <string name="pref_unit_label_metric" translatable="false">Metric</string>
+    <!-- Label for the label Imperial [CHAR LIMIT=25] -->
+    <string name="pref_unit_label_imperial" translatable="false">Imperial</string>
+    <!-- Label for the unit value metric [CHAR LIMIT=NONE] -->
+    <string name="pref_unit_metric" translatable="false">metric</string>
+    <!-- Label for the unit value imperial [CHAR LIMIT=NONE] -->
+    <string name="pref_unit_imperial" translatable="false">imperial</string>
+
+
 </resources>
