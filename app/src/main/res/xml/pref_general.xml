@@ -6,7 +6,7 @@
         android:inputType="text"
         android:key="@string/pref_location_key"
         android:singleLine="true"
-        android:summary="Set a valid postcode for the weather info"
+        android:summary="@string/pref_location_default"
         android:title="@string/pref_location_label" />
 
     <ListPreference
@@ -14,7 +14,7 @@
         android:entries="@array/pref_unit_options"
         android:entryValues="@array/pref_unit_values"
         android:key="@string/pref_unit_key"
-        android:summary="Select the option to display temperature in relevant units"
+        android:summary="@string/pref_unit_metric"
         android:title="@string/pref_unit_label" />
 
 </PreferenceScreen>

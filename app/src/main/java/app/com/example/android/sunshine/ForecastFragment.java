@@ -148,7 +148,15 @@ public class ForecastFragment extends Fragment {
 
         private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
 
-        private String formatHighLows(double high, double low) {
+        private String formatHighLows(double high, double low, String unitType) {
+
+            if (unitType.equals(getString(R.string.pref_unit_imperial))) {
+
+                high = (high * 1.8) + 32;
+                low = (low * 1.8) + 32;
+            } else if (!unitType.equals(getString(R.string.pref_unit_metric))) {
+                Log.d(LOG_TAG, "Temperature Unit Type invalid : " + unitType);
+            }
 
             long roundedHigh = Math.round(high);
             long roundedLow = Math.round(low);
@@ -222,6 +230,13 @@ public class ForecastFragment extends Fragment {
             gc.add(GregorianCalendar.DATE, -1);
 
             String[] resultStrs = new String[numDays];
+
+            //Get Temperature units from the Shared preference file
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            String unitType = prefs.getString(
+                    getString(R.string.pref_unit_key),
+                    getString(R.string.pref_unit_metric));
+
             for (int i = 0; i < weatherArray.length(); i++) {
                 // For now, using the format "Day, description, hi/low"
                 String day;
@@ -247,7 +262,7 @@ public class ForecastFragment extends Fragment {
                 double high = temperatureObject.getDouble(OWM_MAX);
                 double low = temperatureObject.getDouble(OWM_MIN);
 
-                highAndLow = formatHighLows(high, low);
+                highAndLow = formatHighLows(high, low, unitType);
                 resultStrs[i] = day + " - " + description + " - " + highAndLow;
             }
 
