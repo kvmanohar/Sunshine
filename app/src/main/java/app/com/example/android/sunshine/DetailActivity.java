@@ -43,7 +43,6 @@ public class DetailActivity extends AppCompatActivity {
 
             startActivity(new Intent(this,SettingsActivity.class));
             return true;
-//            Toast.makeText(this, "Settings clicked", Toast.LENGTH_SHORT).show();
         }
 
         return super.onOptionsItemSelected(item);
