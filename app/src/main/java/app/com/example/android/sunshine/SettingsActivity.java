@@ -1,12 +1,12 @@
 package app.com.example.android.sunshine;
 
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
+import android.support.v7.app.AppCompatActivity;
 
 /**
  * Sunshine Settings activity
  */
-public class SettingsActivity extends PreferenceActivity {
+public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,5 +17,6 @@ public class SettingsActivity extends PreferenceActivity {
                .commit();
 
     }
+
 
 }

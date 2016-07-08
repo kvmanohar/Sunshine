@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
 
 /**
  * Settings fragment class
@@ -14,6 +15,7 @@ public class SettingsFragment extends PreferenceFragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         addPreferencesFromResource(R.xml.pref_general);
     }
 
@@ -33,6 +35,14 @@ public class SettingsFragment extends PreferenceFragment
 
     }
 
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updatePreferenceSummary();
+
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -46,6 +56,24 @@ public class SettingsFragment extends PreferenceFragment
         super.onPause();
         getPreferenceManager().getSharedPreferences()
                 .unregisterOnSharedPreferenceChangeListener(this);
+
+    }
+
+    private void updatePreferenceSummary() {
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+        if (sharedPreferences != null) {
+
+            String location = sharedPreferences.getString(getString(R.string.pref_location_key), "");
+            String unitType = sharedPreferences.getString(getString(R.string.pref_unit_key), "");
+
+            Preference pref = findPreference(getString(R.string.pref_location_key));
+            pref.setSummary(location);
+
+            pref = findPreference(getString(R.string.pref_unit_key));
+            pref.setSummary(unitType);
+        }
 
     }
 }
