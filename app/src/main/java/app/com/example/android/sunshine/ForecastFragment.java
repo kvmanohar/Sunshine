@@ -1,11 +1,9 @@
 package app.com.example.android.sunshine;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -37,9 +35,11 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import app.com.example.android.sunshine.utilities.Utility;
+
 /**
  * A placeholder fragment containing a simple view.
- * http://api.openweathermap.org/data/2.5/find?q=London,uk&units=metric&appid=4000c8df847f8f70e1e052a2855da229
+ * http://api.openweathermap.org/data/2.5/find?q=SS141FG,uk&units=metric&appid=4000c8df847f8f70e1e052a2855da229
  */
 public class ForecastFragment extends Fragment {
 
@@ -81,7 +81,6 @@ public class ForecastFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.forecastfragment, menu);
-//                super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -98,8 +97,7 @@ public class ForecastFragment extends Fragment {
     private void updateWeatherData() {
 
         //Get postcode of the location from the Shared preference file
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String location = prefs.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
+        String location = Utility.getPreferredLocation(getActivity());
 
         //Display TOAST message to which the weather data is displayed
         Toast.makeText(getActivity(), "Weather for location: " + location, Toast.LENGTH_LONG).show();
@@ -107,7 +105,6 @@ public class ForecastFragment extends Fragment {
         //Call FetchWeatherTask by passing the postcode string
         FetchWeatherTask weatherTask = new FetchWeatherTask();
         weatherTask.execute(location);
-
     }
 
     private void populateListView(View view) {
@@ -127,7 +124,7 @@ public class ForecastFragment extends Fragment {
         //Now that we have dummy forecast data, create Array adapter.
         //The Array adapter takes data from a source (like our dummy forecastArray
         //use it populate the ListView it's attached to.
-         mForecastAdapter = new ArrayAdapter<>(
+        mForecastAdapter = new ArrayAdapter<>(
                 //the Current context (this fragment's parent activity
                 getActivity(),
                 //ID of list item layout
@@ -135,7 +132,7 @@ public class ForecastFragment extends Fragment {
                 //ID of the textView to populate
                 R.id.list_item_forecast_textview,
                 // Forecast data
-                 weekForecastList);
+                weekForecastList);
 
         // Get a reference to the ListView and attach this adapter to the ListView
         ListView listView = (ListView) view.findViewById(R.id.listview_forecast);
@@ -150,18 +147,21 @@ public class ForecastFragment extends Fragment {
 
         private String formatHighLows(double high, double low, String unitType) {
 
-            if (unitType.equals(getString(R.string.pref_unit_imperial))) {
+            String highStr = "", lowStr = "";
 
-                high = (high * 1.8) + 32;
-                low = (low * 1.8) + 32;
-            } else if (!unitType.equals(getString(R.string.pref_unit_metric))) {
+            if (unitType.equals(getString(R.string.pref_unit_imperial))) {
+                highStr = Utility.formatTemperature(high, false);
+                lowStr = Utility.formatTemperature(low, false);
+
+            } else if (unitType.equals(getString(R.string.pref_unit_metric))) {
+                highStr = Utility.formatTemperature(high, true);
+                lowStr = Utility.formatTemperature(low, true);
+
+            } else {
                 Log.d(LOG_TAG, "Temperature Unit Type invalid : " + unitType);
             }
 
-            long roundedHigh = Math.round(high);
-            long roundedLow = Math.round(low);
-
-            return roundedHigh + "/" + roundedLow;
+            return highStr + "/" + lowStr;
         }
 
         private String buildUriString(String postCode, int numDays) {
@@ -232,10 +232,7 @@ public class ForecastFragment extends Fragment {
             String[] resultStrs = new String[numDays];
 
             //Get Temperature units from the Shared preference file
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            String unitType = prefs.getString(
-                    getString(R.string.pref_unit_key),
-                    getString(R.string.pref_unit_metric));
+            String unitType = Utility.getPreferredUnitType(getActivity());
 
             for (int i = 0; i < weatherArray.length(); i++) {
                 // For now, using the format "Day, description, hi/low"
@@ -326,9 +323,9 @@ public class ForecastFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String[] result) {
-            if (result !=null){
+            if (result != null) {
                 mForecastAdapter.clear();
-                for (String dayForeCastStr : result){
+                for (String dayForeCastStr : result) {
                     mForecastAdapter.add(dayForeCastStr);
                 }
             }
