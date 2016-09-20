@@ -59,6 +59,18 @@ public class WeatherContract {
 
         public static final String TABLE_NAME = "location";
 
+        //The location settings string is what will be sent to OpenWeatherMap as location query
+        public static final String COLUMN_LOCATION_SETTING = "location_setting";
+
+        //Human readable location string, provided by the API. Because for styling, "Mountain view"
+        // is more recognizable than the postcode
+        public static final String COLUMN_CITY_NAME = "city_name";
+
+        //In order to uniquely pinpint the location on the map when we launch the map intent, we
+        //store the latitude and longitude as returned by openWeatherMap.
+        public static final String COLUMN_COORD_LAT = "coord_lat";
+        public static final String COLUMN_COORD_LONG = "coord_long";
+
     }
 
 }
